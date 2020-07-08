@@ -1,0 +1,63 @@
+stages: 
+  - codescan
+  - build
+  - package
+cache:
+  untracked: true
+variables:
+  SONAR_PROJKEY: "cap-pc-web"
+code_scan:
+  stage: codescan
+  only:
+    - dev
+  script:
+    - rm -rf .scannerwork/ 
+    - sonar-scanner -Dsonar.sources=. -Dsonar.projectKey=${SONAR_PROJKEY} -Dsonar.exclusions=static/**
+  tags:
+    - runnernodejs07
+build_dev:
+  stage: build
+  script:
+    # - sed -i "s/appenv:.*/appenv:\x20'dev',/" ./src/public/constant.js
+    - npm i
+    - npm run build:dev
+    - docker login 172.16.100.39 -u harbor -p Harbor
+    - docker build -t 172.16.100.39/lesso_cap/cap-web-browser:dev . 
+    - docker push 172.16.100.39/lesso_cap/cap-web-browser:dev
+    - docker rmi 172.16.100.39/lesso_cap/cap-web-browser:dev
+    - "curl -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' -d '{\"push_data\": {\"tag\": \"dev\"},\"repository\": {\"repo_name\": \"172.16.100.39/lesso_cap/cap-web-browser\"}}' 'http://172.16.100.39:10080/v1-webhooks/endpoint?key=Zn1hQ1YSbXvXgPiR5MvjUwFhfpO9gfTpntNmoMAw&projectId=1a172'"
+  only:
+    - dev
+  tags:
+    - runnernodejs05
+build_uat:
+  stage: build
+  script:
+    # - sed -i "s/appenv:.*/appenv:\x20'qas',/" ./src/public/constant.js
+    - npm i
+    - npm run build:qas
+    - docker login 172.16.100.39 -u harbor -p Harbor
+    - docker build -t 172.16.100.39/lesso_cap/cap-web-browser:qas . 
+    - docker push 172.16.100.39/lesso_cap/cap-web-browser:qas
+    - docker rmi 172.16.100.39/lesso_cap/cap-web-browser:qas
+    - "curl -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' -d '{\"push_data\": {\"tag\": \"qas\"},\"repository\": {\"repo_name\": \"172.16.100.39/lesso_cap/cap-web-browser\"}}' 'http://172.16.100.39:10080/v1-webhooks/endpoint?key=5FTcjgY2ovuexUHvFE5Vs27q1Hj7p7x7MfyqjRAg&projectId=1a507'"
+  only:
+    - uat
+    - hot
+  tags:
+    - runnernodejs01
+ 
+build_app:
+  stage: build
+  script:
+    # - sed -i "s/appenv:.*/appenv:\x20'app',/" ./src/public/constant.js
+    - npm i
+    - npm run build:app
+    - docker login 192.168.3.53 -u harbor -p Harbor
+    - docker build -t 192.168.3.53/lesso_cap/cap-web-browser:$CI_COMMIT_TAG . 
+    - docker push 192.168.3.53/lesso_cap/cap-web-browser:$CI_COMMIT_TAG
+    - docker rmi 192.168.3.53/lesso_cap/cap-web-browser:$CI_COMMIT_TAG
+  only:
+    - tags
+  tags:
+    - runnernodejs02

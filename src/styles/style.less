@@ -1,0 +1,327 @@
+/****************************公用样式************************************************/
+samp {
+  font: 14px;
+  font-family: "Microsoft YaHei", Helvetica, Arial, sans-serif;
+}
+.redItem .el-form-item__label {
+  color: red;
+  text-align: justify;
+  text-justify: distribute-all-lines;
+  text-align-last: justify;
+}
+.centerItem .el-form-item__label {
+  text-align: justify;
+  text-justify: distribute-all-lines;
+  text-align-last: justify;
+}
+.authCompanyDialog{
+  .el-transfer-panel__item{
+    display: block;
+  }
+}
+
+.dynamicForm {
+  .el-form-item {
+    margin-bottom: 5px;
+  }
+
+  .dialog-footer {
+    text-align: center;
+  }
+  .el-dialog__footer {
+    padding-top: 0;
+    margin-top: 0px;
+    text-align: center;
+  }
+}
+.el-cascader {
+  width: 100%;
+}
+
+.pull-right {
+  float: right;
+  .uploader-drop{
+    display: none;
+  }
+}
+
+.rendererClass {
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  background-color: transparent;
+  text-align: left;
+}
+.rendererClassChoosed {
+  border: none;
+  text-decoration: underline;
+  background-color: transparent;
+  text-align: left;
+}
+.rendererClass:hover {
+  cursor: pointer;
+  color: blue;
+  background-color: transparent;
+}
+.rendererClass:focus {
+  border: none;
+}
+.m-overFlow {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/*主界面侧边栏收缩样式 begin */
+.m-left {
+  position: absolute;
+  width: 167px;
+  left: 0;
+  top: 60px;
+  bottom: 0;
+  border-right: 1px solid #ecf0f0;
+  background: linear-gradient(
+    0deg,
+    rgba(107, 182, 235, 1),
+    rgba(12, 130, 215, 1)
+  );
+  overflow-y: auto;
+  transition-duration: 0.3s;
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: transparent;
+  }
+  /*滚动条整体样式*/
+  &::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0);
+    border-radius: 10px;
+  }
+  /*滚动条里面小方块*/
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(236, 240, 240, 0.5);
+    border-radius: 5px;
+  }
+  /*滚动条里面轨道*/
+  ul {
+    li {
+      width: 152px;
+      height: 50px;
+      line-height: 50px;
+      padding-left: 15px;
+      cursor: pointer;
+      .iconfont {
+        float: left;
+        font-size: 14px;
+        color: #fff;
+        padding-right: 10px;
+      }
+      span {
+        float: left;
+        font-size: 13px;
+        color: #fff;
+      }
+    }
+    li:hover {
+      background-color: #0070c0;
+    }
+    .active {
+      background-color: #0070c0;
+    }
+  }
+}
+
+.m-right {
+  position: absolute;
+  left: 167px;
+  right: 0;
+  top: 60px;
+  bottom: 0px;
+  overflow-y: auto;
+  background-color: #fff;
+  transition-duration: 0.3s;
+  .m-telescopic {
+    position: absolute;
+    left: 0;
+    width: 15px;
+    top: 0;
+    bottom: 0;
+    z-index: 999;
+    &:hover {
+      button {
+        background-color: rgba(59, 156, 225, 1);
+        box-shadow: 0 0 8px #999;
+      }
+    }
+    button {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      margin-top: -25px;
+      width: 15px;
+      height: 60px;
+      transition-duration: 0.3s;
+      border: none;
+      border-radius: 0 15px 15px 0;
+      outline: none;
+      color: #fff;
+      background-color: rgba(59, 156, 225, 0);
+      box-shadow: none;
+    }
+  }
+  .m-module {
+    overflow: hidden;
+    .m-title {
+      font-size: 14px;
+      padding-left: 10px;
+      color: #666;
+    }
+    ul {
+      li {
+        float: left;
+        width: 120px;
+        height: 120px;
+        text-align: center;
+        border: 1px solid #ecf0f0;
+        margin: 10px;
+        cursor: pointer;
+        .iconfont {
+          display: block;
+          font-size: 42px;
+          height: 42px;
+          line-height: 42px;
+          width: 42px;
+          margin: 0 auto;
+          margin-top: 24px;
+          margin-bottom: 20px;
+        }
+        span {
+          display: block;
+          font-size: 14px;
+          color: #333;
+        }
+      }
+      li:hover {
+        border: 1px solid #0070c0;
+      }
+      .m-completed {
+        span {
+          color: #0070c0;
+        }
+      }
+    }
+  }
+  .m-module + .m-module {
+    margin-top: 10px;
+  }
+}
+/*主界面侧边栏收缩样式 end */
+
+/**************************************页面样式****************************************************/
+.m-view-mine {
+  .box-card {
+    height: 370px;
+    position: relative;
+    width: 49%;
+    float: left;
+  }
+  .box-card-flow {
+    height: 370px;
+    position: relative;
+    width: 49%;
+    float: right;
+  }
+  .el-card__header {
+    height: 50px;
+  }
+  .el-card__body {
+    overflow-y: auto;
+    padding: 0px;
+    position: absolute;
+    top: 55px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+  }
+  tr {
+    height: 30px;
+    line-height: 30px;
+  }
+}
+
+.m-view-mine {
+  .moreBtn:hover {
+    background-color: transparent;
+  }
+}
+
+.m-view-noticeDetailsComponent {
+  position: relative;
+  height: 100%;
+  .el-button {
+    float: right;
+  }
+  .box-card2 {
+    position: absolute;
+    top: 50px;
+    bottom: 90px;
+    left: 0px;
+    right: 0px;
+  }
+  .noticeFile {
+    right: 0px;
+    left: 0px;
+    position: absolute;
+    bottom: 0px;
+  }
+  .el-card__header {
+    height: 70px;
+    border-bottom: none;
+  }
+  .el-card__body {
+    top: 70px;
+  }
+}
+
+.m-view-noticeList {
+  .el-dialog__body {
+    overflow-y: auto;
+    max-height: 500px;
+  }
+  .m-condition {
+    .el-form-item {
+      margin-bottom: 5px;
+    }
+  }
+  .download-file-status {
+    width: 20%;
+  }
+  .download-file-actions {
+    width: 22%;
+  }
+}
+
+.m-view-template {
+  .upload-demo {
+    margin-left: 20px;
+  }
+}
+
+.m-view-home {
+  .demo-ruleForm {
+    .tip-form-item {
+      margin-bottom: 0;
+    }
+    .tips {
+      margin-left: 100px;
+      font-size: 12px;
+      color: #c0c0c0;
+      display: inline-block;
+      padding: 4px 0;
+    }
+  }
+}
