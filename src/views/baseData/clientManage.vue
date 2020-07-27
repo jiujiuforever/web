@@ -358,15 +358,15 @@ export default {
         },
         {
           headerName: "客户编码",
-          field: "agencyCode",
+          field: "customCode",
           width: 120,
-          tooltipField: "parentCode"
+          tooltipField: "customCode"
         },
         {
           headerName: "客户名称",
-          field: "agencyName",
+          field: "customName",
           width: 320,
-          tooltipField: "enumCode"
+          tooltipField: "customName"
         },
         {
           headerName:"销售区域",
@@ -376,12 +376,14 @@ export default {
         },
         {
           headerName: "状态",
-          width: 90,
+          width: 120,
           field: "state",
           cellRenderer: function(params) {
             if (params.value == 1) return '<span class="ag-icon">启用</span>';
             else if (params.value == 0)
               return '<span class="ag-icon">停用</span>';
+            else if (params.value == 2)
+              return '<span class="ag-icon">客户变更停用</span>'
           }
         }
       ];

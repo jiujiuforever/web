@@ -1,11 +1,12 @@
 const apienv = {
     dev: {
-        auth: "http://172.16.100.43:9999/", // 权限系统
-        cap: "http://192.168.48.132:8090/cap/", //开发环境地址
+        auth: "http://localhost:9999/", // 权限系统
+        cap: "http://localhost:8090/cap/", //开发环境地址
         // cap: "http://172.16.100.47:35267/cap/",
         // cap: "http://192.169.2.47:8090/cap/", //ding
         websocket: "ws://172.16.100.60:15674/ws", //websocket通知
-        file: "http://172.16.100.43:48413/"
+        file: "http://localhost:8097/"
+        
     },
     qas: {
         auth: "http://172.16.100.28:9999/", // 权限系统 172.16.100.28:9999/

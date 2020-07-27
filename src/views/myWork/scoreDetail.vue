@@ -96,7 +96,7 @@
           </el-select>
         </el-col>
         <el-col :span="4">
-          <el-input placeholder="请输入客户编码" clearable v-model="searchCondiction.agencyCode"></el-input>
+          <el-input placeholder="请输入客户编码" clearable v-model="searchCondiction.customCode"></el-input>
         </el-col>
       </el-row>
 
@@ -286,7 +286,7 @@ export default {
       // 搜索条件
       searchCondiction: {
         companyCode: "",
-        agencyCode: "",
+        customCode: "",
         agencyArea: "",
         endDate: "",
         isOneYear: "",
@@ -294,7 +294,7 @@ export default {
         roleCode: "",
         dateMode: 1
       },
-      agencyCode: "",
+      customCode: "",
       //   获取选择的数据源
       selectData: {
         companyList: [],
@@ -315,7 +315,7 @@ export default {
 
       // 点击后积分项分数详细记录表头
       scoreRecord: {
-        agencyCode: "",
+        customCode: "",
         companyCode: "",
         quotaCode: "",
         quotaName: "",
@@ -385,7 +385,7 @@ export default {
     //单行选中
     rowSelected(params) {
       console.log(params)
-      this.scoreRecord.agencyCode = params.data.agencyCode;
+      this.scoreRecord.customCode = params.data.customCode;
       this.scoreRecord.companyCode = this.searchCondiction.companyCode;
       this.scoreRecord.quotaCode = params.colDef.tooltipField;
       this.scoreRecord.quotaName = params.colDef.quotaName;
@@ -426,7 +426,7 @@ export default {
         current: this.pagination.currentPage,
         size: this.pagination.pageSize,
         companyCode: this.searchCondiction.companyCode,
-        agencyCode: this.searchCondiction.agencyCode,
+        customCode: this.searchCondiction.customCode,
         endDate: this.searchCondiction.endDate,
         roleCode: this.searchCondiction.roleCode,
         quotaType: this.searchCondiction.quotaType,
@@ -443,8 +443,8 @@ export default {
           if (data.code == 1) {
             data.rows.forEach((item, index) => {
               gridData.push({
-                agencyCode: item.agencyCode,
-                agencyName: item.agencyName,
+                customCode: item.customCode,
+                customName: item.customName,
                 agencyArea: item.agencyArea,
                 totalScore: item.totalScore,
                 rank: item.rank
@@ -577,7 +577,7 @@ export default {
       let data = {
         current: this.scorePagination.currentPage,
         entity: {
-          agencyCode: this.scoreRecord.agencyCode,
+          customCode: this.scoreRecord.customCode,
           companyCode: this.scoreRecord.companyCode,
           quotaCode: this.scoreRecord.quotaCode,
           endDate: this.searchCondiction.endDate,
@@ -627,15 +627,15 @@ export default {
         },
         {
           headerName: "客户编码",
-          field: "agencyCode",
+          field: "customCode",
           width: 200,
-          tooltipField: "agencyCode"
+          tooltipField: "customCode"
         },
         {
           headerName: "客户",
-          field: "agencyName",
+          field: "customName",
           width: 200,
-          tooltipField: "agencyName"
+          tooltipField: "customName"
         },
         {
           headerName: "销售区域",
@@ -830,6 +830,8 @@ export default {
               val.type = "申诉修改"
             } else if (val.type == 3){
               val.type = "撤销申诉修改"
+            } else if(val.type == 4){
+              val.type = "客户编码变更"
             }
             return val
           });

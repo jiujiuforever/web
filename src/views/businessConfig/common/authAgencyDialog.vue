@@ -105,7 +105,7 @@ export default {
       value: [],
       //  穿梭框别名配置
       props: {
-        key: "agencyCode",
+        key: "customCode",
         label: "CodePlusName"
       },
       leftLoading: false,
@@ -199,7 +199,7 @@ export default {
       console.log(this.rightGrid.copyData);
       let agencyNames = [];
       this.rightGrid.copyData.forEach(val => {
-        agencyNames.push(val.agencyName);
+        agencyNames.push(val.customName);
       });
       this.$emit(
         "setAuthAgency",
@@ -232,7 +232,7 @@ export default {
             // 过滤
             this.rightGrid.rowData.forEach(val => {
               let index = data.rows.findIndex(
-                v => v.agencyCode == val.agencyCode
+                v => v.customCode == val.customCode
               );
               if(index > -1){
                 data.rows.splice(index, 1);
@@ -255,8 +255,8 @@ export default {
     agencyRightSearch() {
       let result = this.rightGrid.copyData.filter(val => {
         if (
-          val.agencyCode.includes(this.rightSearchConditon) ||
-          val.agencyName.includes(this.rightSearchConditon)
+          val.customCode.includes(this.rightSearchConditon) ||
+          val.customName.includes(this.rightSearchConditon)
         ) {
           return val;
         }
@@ -274,14 +274,14 @@ export default {
         },
         {
           headerName: "客户编码",
-          field: "agencyCode",
+          field: "customCode",
           width: 120,
-          tooltipField: "agencyCode"
+          tooltipField: "customCode"
         },
         {
           headerName: "客户名称",
-          field: "agencyName",
-          tooltipField: "agencyName"
+          field: "customName",
+          tooltipField: "customName"
         }
       ];
       let gridOptions = {
@@ -333,8 +333,8 @@ export default {
     leftToRight() {
       let rows = this.leftGrid.gridOptions.api.getSelectedRows();
       rows.forEach(val => {
-        val.kunnr = val.agencyCode,
-        val.kunnrName = val.agencyName
+        val.kunnr = val.customCode,
+        val.kunnrName = val.customName
         this.rightGrid.rowData.push(val);
         this.rightGrid.copyData.push(val)
       });

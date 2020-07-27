@@ -200,7 +200,7 @@ export default {
       if (params.colDef.field == "download") {
         let obj = {
           fileName: params.data.fileName,
-          groupName: "CAP",
+          groupName: "group1",
           viewPath: params.data.url
         };
         this.$http.ScoreReport_downloadTExcel(obj).then(val => {
@@ -420,7 +420,9 @@ export default {
         })
         .catch(err => {
           console.log(err);
-          this.$message.error("上传失败");
+          this.loading = false
+          // this.$message.error("上传失败");
+          Msg.showErrorMsg("上传失败")
         });
     },
     // 获取部门列表

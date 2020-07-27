@@ -107,8 +107,8 @@ export default {
     } else if (this.title == "引入客户") {
       this.holderTitle = "请输入编号或名称";
       this.columnDefs = [
-        { headerName: "客户编号", field: "agencyCode" },
-        { headerName: "客户名称", field: "agencyName" }
+        { headerName: "客户编号", field: "customCode" },
+        { headerName: "客户名称", field: "customName" }
       ];
     } else {
       this.holderTitle = "请输入工号或名称";

@@ -36,7 +36,7 @@
         <el-col :span="4">
           <el-input
             placeholder="输入客户编码或名称"
-            v-model="searchCondiction.agencyCode"
+            v-model="searchCondiction.customCode"
             clearable
             @keyup.native.enter="search"
           ></el-input>
@@ -118,7 +118,7 @@ export default {
       // 搜索条件
       searchCondiction: {
         companyCode: "",
-        agencyCode: "",
+        customCode: "",
         agencyArea: "",
         current: "",
         endDate: "",
@@ -300,15 +300,15 @@ export default {
         },
         {
           headerName: "客户编码",
-          field: "agencyCode",
+          field: "customCode",
           width: 120,
-          tooltipField: "agencyCode"
+          tooltipField: "customCode"
         },
         {
           headerName: "客户",
-          field: "agencyName",
+          field: "customName",
           width: 200,
-          tooltipField: "agencyName"
+          tooltipField: "customName"
         },
         {
           headerName: "销售区域",
@@ -412,10 +412,10 @@ export default {
           companyCode: selectRows[0].companyCode,
           companyName: selectRows[0].companyName,
           agencyCodeList: selectRows.map(val => {
-            return val.agencyCode;
+            return val.customCode;
           }),
           agencyNameList: selectRows.map(val => {
-            return val.agencyName;
+            return val.customName;
           }),
           totalScoreList: selectRows.map(val => {
             return val.totalScore;

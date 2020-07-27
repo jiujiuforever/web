@@ -207,7 +207,7 @@ export default {
         // 用户信息
         userName: this.$global.user.userName,
         userId: this.$global.user.id,
-        group: "CAP"
+        group: "group1"
       },
       viewPath: "",
       fileName: "",
@@ -935,25 +935,6 @@ export default {
         return;
       }
       this.$refs.test.click();
-    },
-    // 判断对象是否相等
-    isObjectValueEqual(a, b) {
-      var aProps = Object.getOwnPropertyNames(a);
-      var bProps = Object.getOwnPropertyNames(b);
-
-      if (aProps.length != bProps.length) {
-        return false;
-      }
-
-      for (var i = 0; i < aProps.length; i++) {
-        var propName = aProps[i];
-        var propA = a[propName];
-        var propB = b[propName];
-        if (propA !== propB) {
-          return false;
-        }
-      }
-      return true;
     }
   }
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="m-window">
+  <div class="m-window m-clientChange">
     <div class="m-conditon">
       <el-row :gutter="10">
         <el-col :span="4">
@@ -13,6 +13,9 @@
         </el-col>
         <el-col :span="2" class="pull-right">
           <el-button type="primary" v-if="btnStatus.changeAdd" @click="dialogVisible = true">新增变更</el-button>
+        </el-col>
+        <el-col :span="2" class="pull-right">
+          <el-button type="primary" v-if="btnStatus.changeRecovery" @click="changeRecovery">撤销变更</el-button>
         </el-col>
         <el-col :span="2" class="pull-right">
           <el-button type="primary" @click="search()" v-if="btnStatus.changeSearch">查询</el-button>
@@ -40,16 +43,55 @@
       ></el-pagination>
     </div>
 
-    <el-dialog title="新增客户变更信息" :visible="dialogVisible" width="50%" :before-close="handleClose">
-      <el-form
-        :model="addForm"
-        ref="addForm"
-        label-width="100px"
-        class="demo-ruleForm"
-        :rules="addFormRule"
+    <el-dialog
+      v-dialogDrag
+      title="新增客户变更信息"
+      :visible="dialogVisible"
+      width="50%"
+      @closed="handleClose"
+      :close-on-click-modal="false"
+    >
+      <!-- 内嵌dialog -->
+      <el-dialog
+        v-dialogDrag
+        width="70%"
+        title="积分项重叠数据"
+        :visible.sync="innerDialogVisible"
+        append-to-body
+        :close-on-click-modal="false"
       >
+        <el-tabs type="border-card" @tab-click="changeTabs">
+          <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.recordTime"></el-tab-pane>
+        </el-tabs>
+        <div class="m-agTable m-bottom" style="height:300px">
+          <ag-grid-vue
+            class="m-agTableContent ag-theme-balham"
+            :gridOptions="innerGrid.gridOptions"
+            :columnDefs="innerGrid.columnDefs"
+            :rowData="innerGrid.rowData"
+            v-loading="loading"
+          ></ag-grid-vue>
+        </div>
+        <div>
+          <label>变更模式：</label>
+          <el-radio v-model="addForm.model" label="1">覆盖</el-radio>
+          <el-radio v-model="addForm.model" v-if="authAdd()" label="2">叠加</el-radio>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="innerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="replaceOrOverlay()" v-if="!saveLoading">保存</el-button>
+          <el-button
+            type="primary"
+            @click="replaceOrOverlay()"
+            :loading="saveLoading"
+            v-if="saveLoading"
+          >保存中</el-button>
+        </div>
+      </el-dialog>
+      <!-- 表单 -->
+      <el-form :model="addForm" ref="addForm" label-width="100px" class="demo-ruleForm">
         <el-row>
-          <el-col :span="12">
+          <el-col :span="10">
             <el-form-item label="客户旧编号" prop="oldCustomCode">
               <el-input
                 v-model.trim="addForm.oldCustomCode"
@@ -67,7 +109,7 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
+          <el-col :span="10">
             <el-form-item label="客户新编号" prop="newCustomCode">
               <el-input
                 v-model.trim="addForm.newCustomCode"
@@ -84,14 +126,6 @@
             <el-form-item label="新客户名称">{{addForm.newCustomName}}</el-form-item>
           </el-col>
         </el-row>
-        <!-- <el-row>
-          <el-form-item label="变更模式">
-            <el-radio-group v-model="addForm.model">
-              <el-radio label="1">替换</el-radio>
-              <el-radio label="2">叠加</el-radio>
-            </el-radio-group>
-          </el-form-item>
-        </el-row>-->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose()">取消</el-button>
@@ -115,6 +149,7 @@ import authorize1 from "@/public/authorize1";
 import gridOptions from "lesso-common/public/gridOptions";
 import Msg from "@/public/message.js";
 import importDataDialog from "@/views/baseData/common/importDataDialog.vue";
+import utils from "@/public/utils";
 export default {
   data() {
     return {
@@ -122,7 +157,8 @@ export default {
       // 初始化权限
       btnStatus: {
         changeSearch: false,
-        changeAdd: false
+        changeAdd: false,
+        changeRecovery: false
       },
       //   查询条件
       searchForm: {
@@ -135,6 +171,13 @@ export default {
         rowData: [],
         columnDefs: []
       },
+      innerGrid: {
+        gridOptions: {},
+        rowData: [],
+        columnDefs: []
+      },
+      // innerGridTabs
+      tabList: [],
       loading: "",
       saveLoading: "",
       //   换页
@@ -158,14 +201,24 @@ export default {
       // 规则
       addFormRule: {
         oldCustomCode: [
-          { required: true, message: "请选择客户旧编码", trigger: "change" }
+          {
+            required: true,
+            message: "请选择客户旧编码",
+            trigger: ["change"]
+          }
         ],
         newCustomCode: [
-          { required: true, message: "请选择客户新编码", trigger: "change" }
+          {
+            required: true,
+            message: "请选择客户新编码",
+            trigger: ["change"]
+          }
         ]
       },
       //   新增弹窗
       dialogVisible: false,
+      innerDialogVisible: false,
+
       importDialogVisible: false,
       isOldCustomCode: true
     };
@@ -179,9 +232,17 @@ export default {
       this.agGrid.gridOptions = Object.assign(gridOptions(), {
         context: {
           componentParent: this
-        }
+        },
+        rowSelection: "single"
       });
       this.agGrid.columnDefs = [
+        {
+          headerName: "",
+          field: "",
+          width: 60,
+          checkboxSelection: true,
+          headerCheckboxSelection: true
+        },
         {
           headerName: "客户旧编号",
           field: "oldCustomCode",
@@ -205,11 +266,23 @@ export default {
         {
           headerName: "变更类型",
           field: "model",
-          width: 90,
+          width: 120,
           cellRenderer: function(params) {
             if (params.value == 1) return '<span class="ag-icon">覆盖</span>';
             else if (params.value == 2)
               return '<span class="ag-icon">叠加</span>';
+          }
+        },
+        {
+          headerName: "变更状态",
+          field: "state",
+          width: 120,
+          cellRenderer: params => {
+            if (params.value == 0) {
+              return "<span>撤销变更</span>";
+            } else if (params.value == 1) {
+              return "<span>已变更</span>";
+            }
           }
         },
         {
@@ -223,6 +296,82 @@ export default {
           width: 240
         }
       ];
+      this.innerGrid.gridOptions = Object.assign(gridOptions(), {
+        context: {
+          componentParent: this
+        }
+      });
+      this.innerGrid.columnDefs = [
+        {
+          headerName: "公司编码",
+          field: "companyCode",
+          width: 120
+        },
+        {
+          headerName: "客户旧编号",
+          field: "oldCustomCode",
+          width: 120
+        },
+        {
+          headerName: "旧客户名称",
+          field: "oldCustomName",
+          width: 240
+        },
+        {
+          headerName: "客户新编号",
+          field: "newCustomCode",
+          width: 120
+        },
+        {
+          headerName: "新客户名称",
+          field: "newCustomName",
+          width: 240
+        },
+        {
+          headerName: "积分项名称",
+          field: "quotaName",
+          width: 120
+        },
+        {
+          headerName: "积分项编码",
+          field: "quotaCode",
+          width: 120
+        },
+        {
+          headerName: "录入频率",
+          field: "quotaType",
+          width: 90,
+          cellRenderer: function(params) {
+            if (params.value == 1) return '<span class="ag-icon">初始分</span>';
+            else if (params.value == 2)
+              return '<span class="ag-icon">按月</span>';
+            else if (params.value == 3)
+              return '<span class="ag-icon>按年</span>';
+            else if (params.value == 4)
+              return '<span class="ag-icon>按季</span>';
+          }
+        },
+        {
+          headerName: "部门名称",
+          field: "roleName",
+          width: 120
+        },
+        {
+          headerName: "旧客户分数",
+          field: "oldFiled",
+          width: 120
+        },
+        {
+          headerName: "新客户分数",
+          field: "newFiled",
+          width: 120
+        },
+        {
+          headerName: "录入时间",
+          field: "recordTime",
+          width: 240
+        }
+      ];
     },
     handleClose() {
       this.dialogVisible = false;
@@ -230,9 +379,11 @@ export default {
     },
     // dialog关闭数据初始化
     initDialog() {
-      (this.addForm.oldCustomCode = ""),
-        (this.addForm.newCustomCode = ""),
-        (this.addForm.model = "1");
+      this.addForm.oldCustomCode = "";
+      this.addForm.newCustomCode = "";
+      this.addForm.model = "1";
+      this.addForm.oldCustomName = "无";
+      this.addForm.newCustomName = "无";
     },
     // 初始化权限按钮
     initAuthBtn() {
@@ -267,8 +418,53 @@ export default {
       this.pageInfo.current = 1;
       this.initData();
     },
+    // 查看交集
+    scoreMixed() {
+      let obj = {
+        oldCustomCode: this.addForm.oldCustomCode,
+        newCustomCode: this.addForm.newCustomCode
+      };
+      return new Promise((resolve, reject) => {
+        this.$http
+          .clientChange_scoreMixed(obj)
+          .then(({ data }) => {
+            if (data.code == 1) {
+              if (data.total > 0) {
+                this.tabList = data.rows.map(val => {
+                  return {
+                    recordTime: new Date(val.recordTime).Format("yyyy-MM"),
+                    sameQuotaList: val.sameQuotaList
+                  };
+                });
+                this.innerGrid.rowData = data.rows[0].sameQuotaList;
+                resolve(true);
+              } else {
+                resolve(false);
+              }
+            } else {
+              Msg.showErrorMsg(data.info);
+            }
+          })
+          .catch(e => {
+            Msg.showErrorMsg(e.response.data.info);
+          });
+      });
+    },
     // 增加变更
-    changeAdd() {
+    async changeAdd() {
+      // 调用查看是否有交集接口
+      let flag = await this.scoreMixed();
+      if (flag) {
+        // 有交集
+        this.innerDialogVisible = true;
+        console.log("有交集");
+      } else {
+        // 无交集
+        this.replaceOrOverlay();
+      }
+    },
+    // 叠加或者替换
+    replaceOrOverlay(model) {
       this.$refs["addForm"].validate(valid => {
         if (valid) {
           this.saveLoading = true;
@@ -277,7 +473,7 @@ export default {
             createId: this.addForm.createId,
             oldCustomCode: this.addForm.oldCustomCode,
             newCustomCode: this.addForm.newCustomCode,
-            model: "1"
+            model: this.addForm.model //1-覆盖 2-叠加
           };
           this.$http
             .clientChange_customCodeChange(obj)
@@ -286,6 +482,7 @@ export default {
                 this.initData();
                 this.handleClose();
                 this.$message.success("变更成功");
+                this.innerDialogVisible = false;
                 this.saveLoading = false;
               } else {
                 this.saveLoading = false;
@@ -299,6 +496,47 @@ export default {
             });
         }
       });
+    },
+    // 还原变更
+    changeRecovery() {
+      let selectRows = this.agGrid.gridOptions.api.getSelectedRows();
+      if (selectRows.length == 0) {
+        this.$alert(`提示：请选择你需要还原的数据`, {
+          showClose: false,
+          confirmButtonText: "确定",
+          customClass: "alertPrompt"
+        });
+        return;
+      } else {
+        this.$confirm(`确定还原吗?`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消"
+        }).then(() => {
+          // 调用还原接口
+          if (selectRows[0].state == 1) {
+            let obj = {
+              id: selectRows[0].id,
+              userId: this.$global.user.id,
+              userName: this.$global.user.employeeName
+            };
+            this.$http
+              .clientChange_undoCustomCodeChange(obj)
+              .then(({ data }) => {
+                if (data.code == 1) {
+                  this.$message.success(data.info);
+                } else {
+                  Msg.showErrorMsg(data.info);
+                }
+                this.initData();
+              })
+              .catch(e => {
+                Msg.showErrorMsg("还原失败");
+              });
+          } else {
+            Msg.showPopMsg("当前变更状态为已撤销");
+          }
+        });
+      }
     },
     // 操作人初始化
     initOperator() {
@@ -314,19 +552,19 @@ export default {
     getSelectedValue(data) {
       if (this.isOldCustomCode) {
         // 旧编码
-        this.addForm.oldCustomName = data[0].agencyName
-        if (data[0].agencyCode == this.addForm.newCustomCode) {
+        this.addForm.oldCustomName = data[0].customName;
+        if (data[0].customCode == this.addForm.newCustomCode) {
           Msg.showErrorMsg("新旧编码不能一致");
           return;
         }
-        this.addForm.oldCustomCode = data[0].agencyCode;
+        this.addForm.oldCustomCode = data[0].customCode;
       } else {
-        this.addForm.newCustomName = data[0].agencyName
-        if (data[0].agencyCode == this.addForm.oldCustomCode) {
+        this.addForm.newCustomName = data[0].customName;
+        if (data[0].customCode == this.addForm.oldCustomCode) {
           Msg.showErrorMsg("新旧编码不能一致");
           return;
         }
-        this.addForm.newCustomCode = data[0].agencyCode;
+        this.addForm.newCustomCode = data[0].customCode;
       }
       console.log();
       this.handleimportDialogVisible();
@@ -342,6 +580,21 @@ export default {
     handleCurrentChange(val) {
       this.pageInfo.current = val;
       this.initData();
+    },
+    changeTabs(tab) {
+      console.log(tab.index);
+      this.innerGrid.rowData = this.tabList[tab.index].sameQuotaList;
+    },
+    // 叠加权限
+    authAdd() {
+      let roles = utils.getSession("userData").roles;
+      let flag = false;
+      roles.forEach(val => {
+        if (val.code == "cap_admin_role") {
+          flag = true;
+        }
+      });
+      return flag
     }
   },
   beforeMount() {
@@ -354,5 +607,15 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped>
+<style lang="less">
+.el-dialog {
+  .el-tabs__content {
+    position: relative;
+    padding: 0px !important;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+  }
+}
 </style>

@@ -535,7 +535,7 @@ export default {
       this.authCompanyLoaing = false;
       let agencyNameList = [];
       this.ruleForm.ralUserCusCodeList.forEach(val => {
-        agencyNameList.push(val.kunnrName);
+        agencyNameList.push(val.customName);
       });
       this.ruleForm.showauthAgency = agencyNameList.join(",");
       this.selectedValue = this.ruleForm.ralUserCusCodeList;

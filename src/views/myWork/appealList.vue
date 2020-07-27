@@ -461,7 +461,7 @@ export default {
       let data = {
         current: 1,
         entity: {
-          agencyCode: this.appealDetail.customCode,
+          customCode: this.appealDetail.customCode,
           companyCode: this.appealDetail.companyCode,
           date: this.appealDetail.recordTime,
           quotaCode: this.appealDetail.quotaCode
@@ -511,6 +511,8 @@ export default {
               val.type = "申诉修改"
             } else if (val.type == 3){
               val.type = "撤销申诉修改"
+            } else if(val.type == 4){
+              val.type = "客户编码变更"
             }
             return val
           });

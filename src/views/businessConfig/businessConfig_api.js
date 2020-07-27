@@ -169,6 +169,22 @@ export default {
             url: "target/queryCustomInTarget",
             params: data
         }),
+    clientChange_scoreMixed: data =>
+        req({
+            baseUrl: "cap",
+            method: "get",
+            url: 'customCodeLog/querySameInCustomCodeChange',
+            isOriginalGET: true,
+            params: data
+        }),
+    clientChange_undoCustomCodeChange: data =>
+        req({
+            baseUrl: "cap",
+            method: "get",
+            url: "customCodeLog/undoCustomCodeChange",
+            isOriginalGET: true,
+            params: data
+        }),
     /*****************************************home主页的权限**********************************************/
     homeRouter_getSystemAuth: data =>
         req({

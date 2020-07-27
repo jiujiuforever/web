@@ -70,7 +70,7 @@ const constant = {
     isAccount: "",
 
     // 文件存储组名
-    group: "CAP"
+    group: "group1"
 };
 constant.systemId = systemId[constant.appenv];
 export default constant;
