@@ -4,7 +4,8 @@ const apienv = {
         cap: "http://localhost:8090/cap/", //开发环境地址
         // cap: "http://172.16.100.47:35267/cap/",
         // cap: "http://192.169.2.47:8090/cap/", //ding
-        websocket: "ws://172.16.100.60:15674/ws", //websocket通知
+        // websocket: "ws://172.16.100.60:15674/ws", //websocket通知
+        websocket: "ws://localhost:15674/ws", //websocket通知
         file: "http://localhost:8097/"
         
     },
